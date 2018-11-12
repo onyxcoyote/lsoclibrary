@@ -18,8 +18,7 @@ package lsoc.library.settings;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.ResultSet; //hmm
-import java.sql.SQLException; //hmm
+
 
 /**
  * Object for storing simple name/value pairs (both stored as string)
@@ -79,25 +78,6 @@ public class Setting
         ex.printStackTrace(new PrintWriter(sw));
         String stackString = sw.toString();
         errorMessage += "|"+stackString;
-    }
-    
-    /**
-     * Constuctor
-     * @param rs
-     * @throws SQLException 
-     */
-    public Setting(ResultSet rs) throws SQLException
-    {
-        try
-        {
-            settingName =  rs.getString("settingname");
-            settingValue =  rs.getString("settingvalue");
-        }
-        catch(Exception ex)
-        {
-            this.errorMessage = ex.toString();
-        }
-                    
     }
 
     /**

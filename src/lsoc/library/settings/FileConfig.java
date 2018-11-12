@@ -63,13 +63,17 @@ public class FileConfig
     /**
      * Constructor.  After construction, it is recommended to Force Initialization with Initialize();
      * @param _loggingProvider
-     * @throws IOException 
      */
     public FileConfig(ILoggingProvider _loggingProvider) 
     {
         loggingProvider = _loggingProvider;    
     }
     
+    /**
+     * Initialize FileConfig object
+     * @throws IOException
+     * @throws Exception 
+     */
     public void Initialize() throws IOException, Exception
     {
         //GET METACONFIG FILE
