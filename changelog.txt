@@ -1,0 +1,3 @@
+v0.0.1 - initial release
+   settings (get settings from java .properties files)
+   
