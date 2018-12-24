@@ -18,10 +18,15 @@
  */
 package lsoc.library.providers.logging;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import lsoc.library.providers.logging.ILoggingProvider;
-import static lsoc.library.providers.logging.LoggingProviderFlatFile.DATE_FORMAT_TO_SECONDS_FILENAME;
 import lsoc.library.utilities.ExceptionUtilities;
 
 
@@ -30,35 +35,63 @@ import lsoc.library.utilities.ExceptionUtilities;
  *  
  * @author onyxcoyote <no-reply@onyxcoyote.com>
  */
-public class LoggingProviderSimple implements ILoggingProvider
+public class LoggingProviderFlatFile implements ILoggingProvider
 {
-    
+    private static PrintStream logFile;
+    public static String DATE_FORMAT_TO_SECONDS_FILENAME = "yyyy-MM-dd_HH-mm-ss-SSS";
     public static String DATE_FORMAT_TO_SECONDS_LOGTEXT = "yyyy-MM-dd HH:mm:ss.SSS";
+    private SimpleDateFormat df_filename = new SimpleDateFormat(DATE_FORMAT_TO_SECONDS_FILENAME);
     private SimpleDateFormat df_logText = new SimpleDateFormat(DATE_FORMAT_TO_SECONDS_LOGTEXT);
+    private static final String LOG_FILE_EXTENTION = ".lsoc.log";
+    
+    /**
+     * 
+     * @param fileName
+     * @throws FileNotFoundException 
+     */
+    public LoggingProviderFlatFile(String fileName) throws FileNotFoundException, IOException
+    {
+        //todo: check for unsafe paths
 
+        
+        
+        File newlog = new File(fileName+LOG_FILE_EXTENTION);
+        if(newlog.exists())
+        {
+            //rename log file if it already exists
+            String _timeStamp = df_filename.format(Calendar.getInstance().getTime());
+            File newlogRenamed = new File(fileName+_timeStamp+LOG_FILE_EXTENTION);
+            Files.move(newlog.toPath(), newlogRenamed.toPath());
+        }
+        else
+        {
+            //file should be created automatically if it doesn't exist
+        }
+               
+        logFile = new PrintStream(new FileOutputStream(fileName+LOG_FILE_EXTENTION));
+        this.LogMessage("Starting LoggingProviderFlatFile");
+    }
+    
     @Override
     public boolean LogMessage(String textToLog)
     {
-        //this could be replaced with more complex logging like logging to a log file or database
-        return LogMessage_NoDependency(textToLog);
+        String _timeStamp = df_logText.format(Calendar.getInstance().getTime());
+        logFile.append(_timeStamp + " " + textToLog+"\r\n");
+        return true;
     }
 
     @Override
     public boolean LogException(Exception ex)
     {
         //this could be replaced with more complex logging like logging to a log file or database
-        return LogException_NoDependency(ex);
+        return LogMessage(ExceptionUtilities.ExceptionToString(ex));
     }
 
     @Override
     public boolean LogException(Exception ex, String exDescription)
     {
         //this could be replaced with more complex logging like logging to a log file or database
-        boolean status;
-        status = LogMessage_NoDependency(exDescription);
-        status = status & LogException_NoDependency(ex);
-        
-        return status;
+        return LogMessage(ExceptionUtilities.ExceptionToString(ex) + " " + exDescription);
     }
 
     /**
@@ -71,8 +104,7 @@ public class LoggingProviderSimple implements ILoggingProvider
     {
         try
         {
-            String _timeStamp = df_logText.format(Calendar.getInstance().getTime());
-            System.out.println(_timeStamp + " " + message);
+            System.out.println(message);
         }
         catch(Exception inEx)
         {
@@ -91,9 +123,8 @@ public class LoggingProviderSimple implements ILoggingProvider
     {
         try
         {
-            String _timeStamp = df_logText.format(Calendar.getInstance().getTime());
             String exString = ExceptionUtilities.ExceptionToString(ex);        
-            System.out.println(_timeStamp + " " + exString);
+            System.out.println(exString);
         }
         catch(Exception inEx)
         {

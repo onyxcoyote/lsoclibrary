@@ -59,6 +59,8 @@ public class FileConfig
     
     private boolean initialized = false;
     
+    private boolean configFileCompiledIn = false;
+    
     private static String META_CONFIG_PROPERTIES_FILE_NAME = "metaconfig.properties";
     private static String PROPERTYNAME_CONFIGFILE = "configfile";
     
@@ -69,6 +71,17 @@ public class FileConfig
     public FileConfig(ILoggingProvider _loggingProvider) 
     {
         loggingProvider = _loggingProvider;    
+    }
+    
+    /**
+     * 
+     * @param _loggingProvider
+     * @param _configFileCompiledIn - true if config file is compiled into JAR. false if using a separate file.
+     */
+    public FileConfig(ILoggingProvider _loggingProvider, boolean _configFileCompiledIn) 
+    {
+        loggingProvider = _loggingProvider;    
+        configFileCompiledIn = _configFileCompiledIn;
     }
     
     /**
@@ -148,8 +161,18 @@ public class FileConfig
             }
             
             Properties prop=new Properties();
-            //InputStream inStream = getClass().getResourceAsStream(configFile); //get file compiled into JAR
-            FileInputStream inStream =  new FileInputStream(configFile); //get setting from file
+            
+            InputStream inStream;
+            if(configFileCompiledIn)
+            {
+                //InputStream
+                 inStream = getClass().getResourceAsStream(configFile); //get file compiled into JAR
+            }
+            else
+            {
+                //FileInputStream
+                inStream =  new FileInputStream(configFile); //get setting from file
+            }
             prop.load(inStream);
             inStream.close();
 
@@ -193,7 +216,17 @@ public class FileConfig
         try
         {
             Properties prop=new Properties();
-            InputStream inStream = getClass().getResourceAsStream(configFile);
+            InputStream inStream;
+            if(configFileCompiledIn)
+            {
+                //InputStream
+                 inStream = getClass().getResourceAsStream(configFile); //get file compiled into JAR
+            }
+            else
+            {
+                //FileInputStream
+                inStream =  new FileInputStream(configFile); //get setting from file
+            }
             prop.load(inStream);
             inStream.close();
 
