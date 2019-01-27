@@ -230,8 +230,17 @@ public class FileConfig
             prop.load(inStream);
             inStream.close();
 
-            String value = prop.get(key).toString();
-            return value;
+            Object val = prop.get(key);
+            if(val == null)
+            {
+                return null;
+            }
+            else
+            {
+                String strValue = prop.get(key).toString();
+                return strValue;
+            }
+            
         }
         catch(Exception ex)
         {
